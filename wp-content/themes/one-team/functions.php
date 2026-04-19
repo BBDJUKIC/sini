@@ -132,47 +132,19 @@ function one_team_resolve_image($image_field): array
 }
 
 /**
- * Fixed navigation items required by project.
- *
- * @return array<int, array<string, string>>
+ * Fallback for primary menu when no custom menu is assigned.
  */
-function one_team_get_core_navigation_items(): array
+function one_team_primary_menu_fallback(): void
 {
-    $targets = [
-        [
-            'label'      => __('Wer wir sind', 'one-team'),
-            'slug_guesses' => ['wer-wir-sind', 'wer-wir-sinde', 'wer-wir-sind-2'],
-        ],
-        [
-            'label'      => __('Vision', 'one-team'),
-            'slug_guesses' => ['vision'],
-        ],
-        [
-            'label'      => __('Q&A', 'one-team'),
-            'slug_guesses' => ['q-a', 'qa', 'fragen-und-antworten'],
-        ],
-    ];
-
-    $items = [];
-
-    foreach ($targets as $target) {
-        $url = '#';
-
-        foreach ($target['slug_guesses'] as $slug) {
-            $page = get_page_by_path($slug);
-            if ($page instanceof WP_Post) {
-                $url = get_permalink($page);
-                break;
-            }
-        }
-
-        $items[] = [
-            'label' => $target['label'],
-            'url'   => $url,
-        ];
-    }
-
-    return $items;
+    wp_page_menu([
+        'menu_class'  => 'mobile-nav__list',
+        'show_home'   => true,
+        'container'   => false,
+        'depth'       => 1,
+        'echo'        => true,
+        'link_before' => '',
+        'link_after'  => '',
+    ]);
 }
 
 /**
