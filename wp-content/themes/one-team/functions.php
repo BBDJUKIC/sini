@@ -37,7 +37,7 @@ function one_team_setup(): void
     ]);
 
     register_nav_menus([
-        'primary' => __('Primäre Navigation', 'one-team'),
+        'primary' => __('Primary Navigation', 'one-team'),
     ]);
 }
 add_action('after_setup_theme', 'one_team_setup');
@@ -68,6 +68,11 @@ function one_team_enqueue_assets(): void
         ONE_TEAM_VERSION,
         true
     );
+
+    wp_localize_script('one-team-main', 'oneTeamA11y', [
+        'openNavigationLabel'  => esc_attr__('Open navigation', 'one-team'),
+        'closeNavigationLabel' => esc_attr__('Close navigation', 'one-team'),
+    ]);
 }
 add_action('wp_enqueue_scripts', 'one_team_enqueue_assets');
 

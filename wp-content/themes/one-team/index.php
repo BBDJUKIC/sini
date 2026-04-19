@@ -23,7 +23,7 @@ get_header();
         else :
             ?>
             <article class="content-page">
-                <h1 class="content-page__title"><?php esc_html_e('Inhalt nicht gefunden', 'one-team'); ?></h1>
+                <h1 class="content-page__title"><?php esc_html_e('Content not found', 'one-team'); ?></h1>
             </article>
             <?php
         endif;

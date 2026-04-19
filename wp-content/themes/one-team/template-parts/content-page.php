@@ -37,7 +37,7 @@ $intro_text = one_team_get_field('page_intro_text');
         the_content();
 
         wp_link_pages([
-            'before' => '<nav class="page-links" aria-label="' . esc_attr__('Seiten', 'one-team') . '">',
+            'before' => '<nav class="page-links" aria-label="' . esc_attr__('Pages', 'one-team') . '">',
             'after'  => '</nav>',
         ]);
         ?>

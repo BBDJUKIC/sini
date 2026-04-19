@@ -22,7 +22,7 @@ if (! defined('ABSPATH')) {
 <body <?php body_class(); ?>>
     <?php wp_body_open(); ?>
 
-    <a class="skip-link" href="#main-content"><?php esc_html_e('Zum Inhalt springen', 'one-team'); ?></a>
+    <a class="skip-link" href="#main-content"><?php esc_html_e('Skip to content', 'one-team'); ?></a>
 
     <header class="site-header" role="banner">
         <div class="site-header__inner container">
@@ -35,14 +35,14 @@ if (! defined('ABSPATH')) {
                 type="button"
                 aria-expanded="false"
                 aria-controls="mobile-navigation"
-                aria-label="<?php esc_attr_e('Navigation öffnen', 'one-team'); ?>">
+                aria-label="<?php esc_attr_e('Open navigation', 'one-team'); ?>">
                 <span class="menu-toggle__line" aria-hidden="true"></span>
                 <span class="menu-toggle__line" aria-hidden="true"></span>
                 <span class="menu-toggle__line" aria-hidden="true"></span>
             </button>
         </div>
 
-        <nav id="mobile-navigation" class="mobile-nav" aria-label="<?php esc_attr_e('Hauptnavigation', 'one-team'); ?>" hidden>
+        <nav id="mobile-navigation" class="mobile-nav" aria-label="<?php esc_attr_e('Main navigation', 'one-team'); ?>" hidden>
             <div class="mobile-nav__inner container">
                 <?php
                 wp_nav_menu([
@@ -56,7 +56,7 @@ if (! defined('ABSPATH')) {
                 ?>
 
                 <div class="mobile-nav__language">
-                    <p class="mobile-nav__label"><?php esc_html_e('Sprache', 'one-team'); ?></p>
+                    <p class="mobile-nav__label"><?php esc_html_e('Language', 'one-team'); ?></p>
                     <?php
                     if (function_exists('one_team_render_gtranslate')) {
                         echo one_team_render_gtranslate(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

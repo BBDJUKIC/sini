@@ -1,6 +1,10 @@
 (function () {
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.getElementById('mobile-navigation');
+  const labels = window.oneTeamA11y || {
+    openNavigationLabel: 'Open navigation',
+    closeNavigationLabel: 'Close navigation',
+  };
 
   if (!toggle || !nav) {
     return;
@@ -11,14 +15,14 @@
 
   const closeMenu = () => {
     toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Navigation öffnen');
+    toggle.setAttribute('aria-label', labels.openNavigationLabel);
     nav.hidden = true;
     document.body.classList.remove('menu-open');
   };
 
   const openMenu = () => {
     toggle.setAttribute('aria-expanded', 'true');
-    toggle.setAttribute('aria-label', 'Navigation schließen');
+    toggle.setAttribute('aria-label', labels.closeNavigationLabel);
     nav.hidden = false;
     document.body.classList.add('menu-open');
   };
@@ -86,7 +90,7 @@
     if (mediaQuery.matches) {
       nav.hidden = false;
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Navigation öffnen');
+      toggle.setAttribute('aria-label', labels.openNavigationLabel);
       document.body.classList.remove('menu-open');
     } else if (!isOpen()) {
       nav.hidden = true;

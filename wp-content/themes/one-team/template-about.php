@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Wer wir sind
+ * Template Name: About Us
  * Template Post Type: page
  *
  * @package one-team

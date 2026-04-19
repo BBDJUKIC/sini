@@ -36,7 +36,7 @@ get_header();
                 </div>
             </article>
 
-            <section class="qa-comments" aria-label="<?php esc_attr_e('Fragen und Antworten', 'one-team'); ?>">
+            <section class="qa-comments" aria-label="<?php esc_attr_e('Questions and answers', 'one-team'); ?>">
                 <?php comments_template(); ?>
             </section>
             <?php
