@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: About Us
+ * Template Name: Mission
  * Template Post Type: page
  *
  * @package one-team
