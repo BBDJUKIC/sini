@@ -32,6 +32,12 @@ get_header();
         $has_content = $raw_content !== '';
         ?>
 
+         <?php if ($has_content) : ?>
+            <section class="home-intro entry-content" aria-label="<?php esc_attr_e('Startseiteninhalt', 'one-team'); ?>">
+                <?php the_content(); ?>
+            </section>
+        <?php endif; ?>
+
         <?php if (! empty($home_image['url'])) : ?>
             <img
                 class="home-logo"
@@ -44,11 +50,7 @@ get_header();
             <h1 class="home-title"><?php the_title(); ?></h1>
         <?php endif; ?>
 
-        <?php if ($has_content) : ?>
-            <section class="home-intro entry-content" aria-label="<?php esc_attr_e('Startseiteninhalt', 'one-team'); ?>">
-                <?php the_content(); ?>
-            </section>
-        <?php endif; ?>
+       
 
     <?php endwhile; ?>
 </main>
