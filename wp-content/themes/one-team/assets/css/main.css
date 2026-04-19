@@ -282,7 +282,7 @@ body.menu-open {
 }
 
 .content-page__title {
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: 52px;
   margin-bottom: var(--ot-space-2);
 }
 
