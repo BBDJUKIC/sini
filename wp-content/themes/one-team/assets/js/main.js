@@ -11,12 +11,16 @@
 
   const closeMenu = () => {
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Navigation öffnen');
     nav.hidden = true;
+    document.body.classList.remove('menu-open');
   };
 
   const openMenu = () => {
     toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Navigation schließen');
     nav.hidden = false;
+    document.body.classList.add('menu-open');
   };
 
   const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
@@ -82,8 +86,11 @@
     if (mediaQuery.matches) {
       nav.hidden = false;
       toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Navigation öffnen');
+      document.body.classList.remove('menu-open');
     } else if (!isOpen()) {
       nav.hidden = true;
+      document.body.classList.remove('menu-open');
     }
   };
 

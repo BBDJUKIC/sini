@@ -26,6 +26,9 @@ if (! defined('ABSPATH')) {
 
     <header class="site-header" role="banner">
         <div class="site-header__inner container">
+            <a class="site-header__brand" href="<?php echo esc_url(home_url('/')); ?>">
+                <?php bloginfo('name'); ?>
+            </a>
 
             <button
                 class="menu-toggle"
@@ -44,8 +47,10 @@ if (! defined('ABSPATH')) {
                 <?php
                 wp_nav_menu([
                     'theme_location' => 'primary',
+                    'menu_id'        => 'primary-menu',
                     'container'      => false,
                     'menu_class'     => 'mobile-nav__list',
+                    'depth'          => 1,
                     'fallback_cb'    => 'one_team_primary_menu_fallback',
                 ]);
                 ?>

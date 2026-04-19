@@ -106,6 +106,10 @@ p {
   border-bottom: 1px solid var(--ot-border);
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
 .site-header__inner {
   min-height: 4rem;
   display: flex;
@@ -136,6 +140,10 @@ p {
   cursor: pointer;
 }
 
+.menu-toggle:focus-visible {
+  border-color: var(--ot-primary);
+}
+
 .menu-toggle__line {
   width: 18px;
   height: 2px;
@@ -159,10 +167,13 @@ p {
 .mobile-nav {
   border-top: 1px solid var(--ot-border);
   background: var(--ot-white);
+  box-shadow: 0 14px 32px rgba(12, 35, 54, 0.08);
 }
 
 .mobile-nav__inner {
-  padding: var(--ot-space-4) 0 var(--ot-space-5);
+  padding: var(--ot-space-3) 0 var(--ot-space-5);
+  max-height: min(78dvh, 40rem);
+  overflow-y: auto;
 }
 
 .mobile-nav__list {
@@ -178,7 +189,7 @@ p {
 .mobile-nav__list a {
   display: block;
   width: 100%;
-  padding: 0.75rem 0;
+  padding: 0.875rem 0;
   color: var(--ot-heading);
   font-size: 1.125rem;
   font-weight: 600;
@@ -189,6 +200,10 @@ p {
 .mobile-nav__list .current-menu-item > a,
 .mobile-nav__list .current_page_item > a {
   color: var(--ot-primary);
+}
+
+.mobile-nav__list a:focus-visible {
+  border-radius: 8px;
 }
 
 .mobile-nav__language {
@@ -209,7 +224,7 @@ p {
 .mobile-nav__language :is(.gtranslate_wrapper, .gt_selector, .gt_float_switcher) {
   display: flex;
   align-items: center;
-  min-height: 40px;
+  min-height: 44px;
 }
 
 /* Main layout */
@@ -225,20 +240,27 @@ p {
 .home-main {
   display: grid;
   place-items: center;
-  padding: var(--ot-space-5) 0;
-}
-
-.home-logo-wrap {
-  display: grid;
-  place-items: center;
+  padding: var(--ot-space-4);
+  min-height: calc(100dvh - 8.5rem);
 }
 
 .home-logo {
-  max-width: min(80vw, 420px);
+  max-width: min(82vw, 420px);
 }
 
 .home-logo--custom .custom-logo-link {
   display: inline-block;
+}
+
+.home-intro {
+  width: min(100%, 38rem);
+  margin-top: var(--ot-space-4);
+  text-align: center;
+  color: var(--ot-text);
+}
+
+.home-intro > *:last-child {
+  margin-bottom: 0;
 }
 
 .home-title {
@@ -405,6 +427,7 @@ p {
   .mobile-nav {
     display: block !important;
     border-top: 0;
+    box-shadow: none;
   }
 
   .mobile-nav__inner {
@@ -413,6 +436,8 @@ p {
     justify-content: space-between;
     gap: var(--ot-space-3);
     padding: 0 0 var(--ot-space-2);
+    max-height: none;
+    overflow: visible;
   }
 
   .mobile-nav__list {
@@ -427,7 +452,7 @@ p {
 
   .mobile-nav__list a {
     border-bottom: 0;
-    padding: 0.25rem 0;
+    padding: 0.35rem 0;
     font-size: 1rem;
   }
 
@@ -439,6 +464,10 @@ p {
 
   .page-main {
     padding: 3rem 0;
+  }
+
+  .home-intro {
+    margin-top: var(--ot-space-5);
   }
 
   .content-page,

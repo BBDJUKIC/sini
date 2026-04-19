@@ -158,15 +158,13 @@ function one_team_resolve_image($image_field): array
  */
 function one_team_primary_menu_fallback(): void
 {
-    wp_page_menu([
-        'menu_class'  => 'mobile-nav__list',
-        'show_home'   => true,
-        'container'   => false,
+    echo '<ul id="primary-menu" class="mobile-nav__list">';
+    wp_list_pages([
+        'title_li'    => '',
         'depth'       => 1,
-        'echo'        => true,
-        'link_before' => '',
-        'link_after'  => '',
+        'sort_column' => 'menu_order,post_title',
     ]);
+    echo '</ul>';
 }
 
 /**
