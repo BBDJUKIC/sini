@@ -72,6 +72,28 @@ function one_team_enqueue_assets(): void
 add_action('wp_enqueue_scripts', 'one_team_enqueue_assets');
 
 /**
+ * Safely render GTranslate shortcode output.
+ *
+ * Prevents fatal errors when shortcode is unavailable or throws.
+ */
+function one_team_render_gtranslate(): string
+{
+    if (! function_exists('shortcode_exists') || ! function_exists('do_shortcode')) {
+        return '';
+    }
+
+    if (! shortcode_exists('gtranslate') && ! shortcode_exists('GTranslate')) {
+        return '';
+    }
+
+    try {
+        return (string) do_shortcode('[gtranslate]');
+    } catch (Throwable $error) {
+        return '';
+    }
+}
+
+/**
  * Helper: return ACF field value when available, fallback to post meta.
  *
  * @param string   $field_name Field key/name.
@@ -83,7 +105,7 @@ function one_team_get_field(string $field_name, ?int $post_id = null)
     $post_id = $post_id ?: get_the_ID();
 
     if (function_exists('get_field')) {
-        return get_field($field_name, $post_id);
+        return call_user_func('get_field', $field_name, $post_id);
     }
 
     return get_post_meta((int) $post_id, $field_name, true);

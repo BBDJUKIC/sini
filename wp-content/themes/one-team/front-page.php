@@ -11,7 +11,15 @@ if (! defined('ABSPATH')) {
 
 get_header();
 
-$home_image = one_team_resolve_image(one_team_get_field('home_logo_image'));
+$home_image = [
+    'url' => '',
+    'alt' => '',
+    'id'  => 0,
+];
+
+if (function_exists('one_team_get_field') && function_exists('one_team_resolve_image')) {
+    $home_image = one_team_resolve_image(one_team_get_field('home_logo_image'));
+}
 ?>
 
 <main id="main-content" class="main-content home-main" role="main">
@@ -22,7 +30,7 @@ $home_image = one_team_resolve_image(one_team_get_field('home_logo_image'));
                 src="<?php echo esc_url($home_image['url']); ?>"
                 alt="<?php echo esc_attr($home_image['alt'] ?: get_bloginfo('name')); ?>"
             >
-        <?php elseif (has_custom_logo()) : ?>
+        <?php elseif (function_exists('has_custom_logo') && has_custom_logo() && function_exists('the_custom_logo')) : ?>
             <div class="home-logo home-logo--custom"><?php the_custom_logo(); ?></div>
         <?php else : ?>
             <h1 class="home-title"><?php bloginfo('name'); ?></h1>

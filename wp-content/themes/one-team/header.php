@@ -26,9 +26,6 @@ if (! defined('ABSPATH')) {
 
     <header class="site-header" role="banner">
         <div class="site-header__inner container">
-            <a class="site-header__brand" href="<?php echo esc_url(home_url('/')); ?>">
-                <?php bloginfo('name'); ?>
-            </a>
 
             <button
                 class="menu-toggle"
@@ -55,7 +52,11 @@ if (! defined('ABSPATH')) {
 
                 <div class="mobile-nav__language">
                     <p class="mobile-nav__label"><?php esc_html_e('Sprache', 'one-team'); ?></p>
-                    <?php echo do_shortcode('[gtranslate]'); ?>
+                    <?php
+                    if (function_exists('one_team_render_gtranslate')) {
+                        echo one_team_render_gtranslate(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    }
+                    ?>
                 </div>
             </div>
         </nav>
