@@ -245,7 +245,7 @@ body.menu-open {
 }
 
 .home-logo {
-  max-width: min(82vw, 420px);
+  max-width: 100%;
 }
 
 .home-logo--custom .custom-logo-link {
