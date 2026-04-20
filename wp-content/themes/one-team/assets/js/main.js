@@ -117,6 +117,27 @@
   const continueButton = document.getElementById('home-language-modal-continue');
   const dialogNode = languageModal.querySelector('.language-modal__dialog');
   const boundSyncNodes = new WeakSet();
+  const skipPopupOnceKey = 'oneTeamLanguageModalSkipOnce';
+
+  const markSkipPopupOnce = () => {
+    try {
+      window.sessionStorage.setItem(skipPopupOnceKey, '1');
+    } catch (error) {
+      // Ignore storage errors.
+    }
+  };
+
+  const consumeSkipPopupOnce = () => {
+    try {
+      const shouldSkip = window.sessionStorage.getItem(skipPopupOnceKey) === '1';
+      if (shouldSkip) {
+        window.sessionStorage.removeItem(skipPopupOnceKey);
+      }
+      return shouldSkip;
+    } catch (error) {
+      return false;
+    }
+  };
   const closeLanguageModal = () => {
 
     languageModal.hidden = true;
@@ -293,6 +314,8 @@
     if (!languageCode || languageCode === currentLanguage) {
       return;
     }
+
+    markSkipPopupOnce();
 
     if (tryApplyLanguage(languageCode)) {
       window.setTimeout(function () {
@@ -481,6 +504,10 @@
   let modalOpenScheduled = false;
 
   const scheduleModalOpen = function () {
+    if (consumeSkipPopupOnce()) {
+      return;
+    }
+
     if (modalOpenScheduled) {
       return;
     }
