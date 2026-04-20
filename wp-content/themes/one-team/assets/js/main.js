@@ -238,6 +238,20 @@
     return items;
   };
 
+  const setGoogTransCookie = (targetCode) => {
+    const value = `/auto/${targetCode}`;
+    const maxAge = 60 * 60 * 24 * 7;
+    const host = window.location.hostname;
+
+    document.cookie = `googtrans=${value}; path=/; max-age=${maxAge}`;
+    document.cookie = `googtrans=${value}; path=/; domain=${host}; max-age=${maxAge}`;
+
+    if (host.split('.').length >= 2) {
+      const baseDomain = `.${host.split('.').slice(-2).join('.')}`;
+      document.cookie = `googtrans=${value}; path=/; domain=${baseDomain}; max-age=${maxAge}`;
+    }
+  };
+
   const tryApplyLanguage = (languageCode) => {
     const normalized = (languageCode || '').toLowerCase();
     if (!normalized) {
@@ -245,7 +259,7 @@
     }
 
     if (typeof window.doGTranslate === 'function') {
-      window.doGTranslate(`en|${normalized}`);
+      window.doGTranslate(`auto|${normalized}`);
       return true;
     }
 
@@ -263,6 +277,7 @@
 
       if (matchingOption) {
         liveSelect.value = matchingOption.value;
+        liveSelect.dispatchEvent(new Event('input', { bubbles: true }));
         liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
         return true;
       }
@@ -273,7 +288,20 @@
 
   const triggerLanguageChange = (item) => {
     const languageCode = (item.code || '').toLowerCase();
+    const currentLanguage = getCurrentLanguageCode();
+
+    if (!languageCode || languageCode === currentLanguage) {
+      return;
+    }
+
     if (tryApplyLanguage(languageCode)) {
+      window.setTimeout(function () {
+        const updatedLanguage = getCurrentLanguageCode();
+        if (updatedLanguage !== languageCode) {
+          setGoogTransCookie(languageCode);
+          window.location.reload();
+        }
+      }, 1200);
       return;
     }
 
@@ -281,7 +309,21 @@
     const retryTimer = window.setInterval(function () {
       attempts += 1;
 
-      if (tryApplyLanguage(languageCode) || attempts >= 15) {
+      if (tryApplyLanguage(languageCode)) {
+        window.clearInterval(retryTimer);
+        window.setTimeout(function () {
+          const updatedLanguage = getCurrentLanguageCode();
+          if (updatedLanguage !== languageCode) {
+            setGoogTransCookie(languageCode);
+            window.location.reload();
+          }
+        }, 1200);
+        return;
+      }
+
+      if (attempts >= 15) {
+        setGoogTransCookie(languageCode);
+        window.location.reload();
         window.clearInterval(retryTimer);
       }
     }, 200);
