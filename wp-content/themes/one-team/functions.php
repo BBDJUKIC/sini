@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('ONE_TEAM_VERSION', '1.1.4');
+define('ONE_TEAM_VERSION', '1.1.5');
 
 /**
  * Theme setup.

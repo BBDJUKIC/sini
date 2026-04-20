@@ -238,29 +238,53 @@
     return items;
   };
 
-  const triggerLanguageChange = (item) => {
-    const languageCode = (item.code || '').toLowerCase();
+  const tryApplyLanguage = (languageCode) => {
+    const normalized = (languageCode || '').toLowerCase();
+    if (!normalized) {
+      return false;
+    }
 
-    const liveLink = document.querySelector(`.mobile-nav__language a.nturl[data-gt-lang="${languageCode}"]`);
-    if (liveLink) {
-      liveLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-      return;
+    if (typeof window.doGTranslate === 'function') {
+      window.doGTranslate(`en|${normalized}`);
+      return true;
+    }
+
+    const liveLink = document.querySelector(`.mobile-nav__language a.nturl[data-gt-lang="${normalized}"]`);
+    if (liveLink && typeof liveLink.click === 'function') {
+      liveLink.click();
+      return true;
     }
 
     const liveSelect = document.querySelector('.mobile-nav__language select.goog-te-combo, select.goog-te-combo');
-    if (liveSelect && languageCode) {
-      const hasOption = Array.from(liveSelect.options).some((option) => (option.value || '').toLowerCase() === languageCode);
-      if (hasOption) {
-        liveSelect.value = languageCode;
+    if (liveSelect) {
+      const matchingOption = Array.from(liveSelect.options).find(
+        (option) => (option.value || '').toLowerCase() === normalized
+      );
+
+      if (matchingOption) {
+        liveSelect.value = matchingOption.value;
         liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        return;
+        return true;
       }
     }
 
-    if (item.type === 'select' && item.select && item.value) {
-      item.select.value = item.value;
-      item.select.dispatchEvent(new Event('change', { bubbles: true }));
+    return false;
+  };
+
+  const triggerLanguageChange = (item) => {
+    const languageCode = (item.code || '').toLowerCase();
+    if (tryApplyLanguage(languageCode)) {
+      return;
     }
+
+    let attempts = 0;
+    const retryTimer = window.setInterval(function () {
+      attempts += 1;
+
+      if (tryApplyLanguage(languageCode) || attempts >= 15) {
+        window.clearInterval(retryTimer);
+      }
+    }, 200);
   };
 
   const ensureSelectedFlagSrc = () => {
