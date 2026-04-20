@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('ONE_TEAM_VERSION', '1.0.0');
+define('ONE_TEAM_VERSION', '1.1.0');
 
 /**
  * Theme setup.
@@ -99,6 +99,24 @@ function one_team_render_gtranslate(): string
 }
 
 /**
+ * Safely render any shortcode string.
+ */
+function one_team_render_shortcode(string $shortcode): string
+{
+    $shortcode = trim($shortcode);
+
+    if ($shortcode === '' || ! function_exists('do_shortcode')) {
+        return '';
+    }
+
+    try {
+        return (string) do_shortcode($shortcode);
+    } catch (Throwable $error) {
+        return '';
+    }
+}
+
+/**
  * Helper: return ACF field value when available, fallback to post meta.
  *
  * @param string   $field_name Field key/name.
@@ -163,13 +181,80 @@ function one_team_resolve_image($image_field): array
  */
 function one_team_primary_menu_fallback(): void
 {
+    $menu_items = [
+        [
+            'label' => 'About Us',
+            'paths' => ['about-us', 'about'],
+        ],
+        [
+            'label' => 'Vision',
+            'paths' => ['vision'],
+        ],
+        [
+            'label' => 'Mission',
+            'paths' => ['mission'],
+        ],
+        [
+            'label' => 'News & Announcements',
+            'paths' => ['news-announcements', 'news'],
+        ],
+        [
+            'label' => 'Contact',
+            'paths' => ['contact'],
+        ],
+    ];
+
     echo '<ul id="primary-menu" class="mobile-nav__list">';
-    wp_list_pages([
-        'title_li'    => '',
-        'depth'       => 1,
-        'sort_column' => 'menu_order,post_title',
-    ]);
+
+    foreach ($menu_items as $menu_item) {
+        $item_url = one_team_resolve_page_url($menu_item['paths']);
+
+        if ($item_url === '') {
+            continue;
+        }
+
+        echo '<li class="menu-item">';
+        echo '<a href="' . esc_url($item_url) . '">' . esc_html($menu_item['label']) . '</a>';
+        echo '</li>';
+    }
+
     echo '</ul>';
+}
+
+/**
+ * Resolve first matching page URL by path list.
+ *
+ * @param array<int, string> $paths Candidate slugs/paths.
+ */
+function one_team_resolve_page_url(array $paths): string
+{
+    foreach ($paths as $path) {
+        $path = trim((string) $path, '/ ');
+        if ($path === '') {
+            continue;
+        }
+
+        $page = get_page_by_path($path);
+        if ($page instanceof WP_Post) {
+            return (string) get_permalink($page->ID);
+        }
+    }
+
+    return '';
+}
+
+/**
+ * Resolve the URL used by the header "Home" link.
+ */
+function one_team_home_link_url(): string
+{
+    $home_page_url = one_team_resolve_page_url(['home']);
+
+    if ($home_page_url !== '') {
+        return $home_page_url;
+    }
+
+    return (string) home_url('/');
 }
 
 /**
@@ -199,6 +284,10 @@ function one_team_body_classes(array $classes): array
 {
     if (is_front_page()) {
         $classes[] = 'is-home-minimal';
+    }
+
+    if (is_page_template('template-language-landing.php')) {
+        $classes[] = 'is-language-landing';
     }
 
     return $classes;

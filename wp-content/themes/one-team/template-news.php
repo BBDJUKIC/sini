@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Vision
+ * Template Name: News & Announcements
  * Template Post Type: page
  *
  * @package one-team
@@ -41,9 +41,7 @@ get_header();
                     <?php the_content(); ?>
                 </div>
             </article>
-            <?php
-        endwhile;
-        ?>
+        <?php endwhile; ?>
     </div>
 </main>
 

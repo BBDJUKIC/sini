@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Vision
+ * Template Name: Contact
  * Template Post Type: page
  *
  * @package one-team
@@ -19,7 +19,8 @@ get_header();
         while (have_posts()) :
             the_post();
 
-            $page_image = one_team_resolve_image(one_team_get_field('page_top_image', get_the_ID()));
+            $page_image             = one_team_resolve_image(one_team_get_field('page_top_image', get_the_ID()));
+            $contact_form_shortcode = trim((string) one_team_get_field('contact_form_shortcode', get_the_ID()));
             ?>
 
             <article id="post-<?php the_ID(); ?>" <?php post_class('content-page'); ?>>
@@ -37,13 +38,19 @@ get_header();
                     <?php endif; ?>
                 </header>
 
-                <div class="content-page__body entry-content">
-                    <?php the_content(); ?>
-                </div>
+                <?php if ($contact_form_shortcode !== '') : ?>
+                    <div class="content-page__body entry-content content-page__contact-form">
+                        <?php
+                        if (function_exists('one_team_render_shortcode')) {
+                            echo one_team_render_shortcode($contact_form_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        } else {
+                            echo do_shortcode($contact_form_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
             </article>
-            <?php
-        endwhile;
-        ?>
+        <?php endwhile; ?>
     </div>
 </main>
 

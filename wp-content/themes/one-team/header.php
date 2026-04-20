@@ -26,8 +26,16 @@ if (! defined('ABSPATH')) {
 
     <header class="site-header" role="banner">
         <div class="site-header__inner container">
-            <a class="site-header__brand" href="<?php echo esc_url(home_url('/')); ?>">
-                <?php bloginfo('name'); ?>
+            <a class="site-header__home-link" href="<?php echo esc_url(one_team_home_link_url()); ?>">
+                Home
+            </a>
+
+            <a class="site-header__logo-link" href="<?php echo esc_url(home_url('/')); ?>" aria-label="<?php esc_attr_e('Language landing page', 'one-team'); ?>">
+                <?php if (function_exists('has_custom_logo') && has_custom_logo() && function_exists('the_custom_logo')) : ?>
+                    <span class="site-header__logo"><?php the_custom_logo(); ?></span>
+                <?php else : ?>
+                    <span class="site-header__logo-text"><?php bloginfo('name'); ?></span>
+                <?php endif; ?>
             </a>
 
             <button
@@ -56,7 +64,7 @@ if (! defined('ABSPATH')) {
                 ?>
 
                 <div class="mobile-nav__language">
-                    <p class="mobile-nav__label"><?php esc_html_e('Language', 'one-team'); ?></p>
+                    <p class="mobile-nav__label">Language</p>
                     <?php
                     if (function_exists('one_team_render_gtranslate')) {
                         echo one_team_render_gtranslate(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

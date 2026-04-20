@@ -1,9 +1,7 @@
 <?php
 /**
- * Front page router.
- *
- * Supports either language-landing or home content structure,
- * based on selected template on the static front page.
+ * Template Name: Home
+ * Template Post Type: page
  *
  * @package one-team
  */
@@ -12,30 +10,14 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-$front_template = get_page_template_slug(get_queried_object_id());
-$is_language_landing = $front_template === 'template-language-landing.php';
-
 get_header();
 ?>
 
-<main id="main-content" class="main-content <?php echo $is_language_landing ? 'language-landing-main' : 'home-main'; ?>" role="main">
-    <div class="container <?php echo $is_language_landing ? 'language-landing' : 'home-layout'; ?>">
+<main id="main-content" class="main-content home-main" role="main">
+    <div class="container home-layout">
         <?php
         while (have_posts()) :
             the_post();
-
-            if ($is_language_landing) :
-                ?>
-                <section class="language-landing__card" aria-label="Language selection">
-                    <?php
-                    if (function_exists('one_team_render_gtranslate')) {
-                        echo one_team_render_gtranslate(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                    }
-                    ?>
-                </section>
-                <?php
-                continue;
-            endif;
 
             $home_top_text    = trim((string) one_team_get_field('home_top_text', get_the_ID()));
             $home_bottom_text = trim((string) one_team_get_field('home_bottom_text', get_the_ID()));
@@ -59,7 +41,6 @@ get_header();
                     <?php echo wp_kses_post(wpautop($home_bottom_text)); ?>
                 </div>
             <?php endif; ?>
-
         <?php endwhile; ?>
     </div>
 </main>
