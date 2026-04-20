@@ -116,28 +116,7 @@
   const closeButton = languageModal.querySelector('.language-modal__close');
   const continueButton = document.getElementById('home-language-modal-continue');
   const dialogNode = languageModal.querySelector('.language-modal__dialog');
-  const storageKey = 'oneTeamLanguageModalSeen';
-
-  const rememberModalSeen = () => {
-    try {
-      window.sessionStorage.setItem(storageKey, '1');
-    } catch (error) {
-      // Ignore storage access issues silently.
-    }
-  };
-
-  const hasSeenModal = () => {
-    try {
-      return window.sessionStorage.getItem(storageKey) === '1';
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const closeLanguageModal = (remember = true) => {
-    if (remember) {
-      rememberModalSeen();
-    }
+  const closeLanguageModal = () => {
 
     languageModal.hidden = true;
     languageModal.setAttribute('aria-hidden', 'true');
@@ -193,7 +172,7 @@
     button.textContent = item.label;
 
     button.addEventListener('click', function () {
-      closeLanguageModal(true);
+      closeLanguageModal();
 
       if (item.type === 'select' && item.select && item.value) {
         item.select.value = item.value;
@@ -218,19 +197,19 @@
 
   if (closeButton) {
     closeButton.addEventListener('click', function () {
-      closeLanguageModal(true);
+      closeLanguageModal();
     });
   }
 
   if (continueButton) {
     continueButton.addEventListener('click', function () {
-      closeLanguageModal(true);
+      closeLanguageModal();
     });
   }
 
   languageModal.addEventListener('click', function (event) {
     if (event.target === languageModal || event.target.classList.contains('language-modal__overlay')) {
-      closeLanguageModal(true);
+      closeLanguageModal();
     }
   });
 
@@ -242,13 +221,17 @@
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' && !languageModal.hidden) {
-      closeLanguageModal(true);
+      closeLanguageModal();
     }
   });
 
-  if (!hasSeenModal()) {
-    window.addEventListener('load', function () {
-      window.setTimeout(openLanguageModal, 1000);
-    });
+  const scheduleModalOpen = function () {
+    window.setTimeout(openLanguageModal, 1000);
+  };
+
+  if (document.readyState === 'complete') {
+    scheduleModalOpen();
+  } else {
+    window.addEventListener('load', scheduleModalOpen, { once: true });
   }
 })();
