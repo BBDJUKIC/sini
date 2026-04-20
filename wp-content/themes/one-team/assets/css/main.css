@@ -563,6 +563,10 @@ body.menu-open {
   text-align: center;
 }
 
+.home-layout__top-text {
+  font-size: 52px;
+}
+
 @media screen and (max-width: 767px) {
 
   .site-header__inner {
@@ -586,12 +590,13 @@ body.menu-open {
   .custom-logo-link {
     width: 80px;
   }
-.home-layout {
-  width: 90%;
-}
 
-}
+  .home-layout {
+    width: 90%;
+  }
 
-.home-layout__top-text {
-  font-size: 52px;
+  .home-layout__top-text {
+    font-size: 42px;
+  }
+
 }
