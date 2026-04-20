@@ -418,6 +418,7 @@
   const startLanguageWatcher = () => {
     if (initModalWhenLanguagesReady()) {
       bindDropdownSync();
+      scheduleModalOpen();
       return;
     }
 
