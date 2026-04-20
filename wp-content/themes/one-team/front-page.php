@@ -62,6 +62,37 @@ get_header();
 
         <?php endwhile; ?>
     </div>
+
+    <?php if (! $is_language_landing) : ?>
+        <div class="language-modal" id="home-language-modal" hidden aria-hidden="true">
+            <div class="language-modal__overlay" aria-hidden="true"></div>
+
+            <div class="language-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="home-language-modal-title">
+                <button type="button" class="language-modal__close" aria-label="Close language selector">
+                    &times;
+                </button>
+
+                <div class="language-modal__content">
+                    <h2 class="language-modal__title" id="home-language-modal-title">Choose your language</h2>
+                    <p class="language-modal__subtitle">Please select your preferred language to continue.</p>
+
+                    <div class="language-modal__grid" id="home-language-modal-grid"></div>
+
+                    <button type="button" class="language-modal__continue" id="home-language-modal-continue">
+                        Continue in current language
+                    </button>
+                </div>
+            </div>
+
+            <div class="language-modal__source" id="language-modal-source" hidden aria-hidden="true">
+                <?php
+                if (function_exists('one_team_render_gtranslate')) {
+                    echo one_team_render_gtranslate(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
+                ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </main>
 
 <?php
