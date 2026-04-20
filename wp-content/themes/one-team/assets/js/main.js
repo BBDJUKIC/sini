@@ -134,66 +134,77 @@
     }
   };
 
-  const linkNodes = Array.from(
-    languageSource.querySelectorAll('a.nturl, a[data-gt-lang], .gtranslate_wrapper a, .gt_float_switcher a, a[href], a[onclick]')
-  ).filter((link) => {
-    const label = (link.textContent || '').trim();
-    return label !== '';
-  });
-
-  let languageItems = linkNodes.map((link) => ({
-    label: (link.textContent || '').trim(),
-    link,
-    type: 'link',
-  }));
-
-  if (!languageItems.length) {
-    const selectNode = languageSource.querySelector('select');
-    if (selectNode) {
-      languageItems = Array.from(selectNode.options)
-        .filter((option) => option.value && !option.disabled)
-        .map((option) => ({
-          label: (option.textContent || '').trim(),
-          value: option.value,
-          select: selectNode,
-          type: 'select',
-        }));
-    }
-  }
-
-  if (!languageItems.length) {
-    return;
-  }
-
-  languageItems.forEach((item) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'language-modal__option';
-    button.textContent = item.label;
-
-    button.addEventListener('click', function () {
-      closeLanguageModal();
-
-      if (item.type === 'select' && item.select && item.value) {
-        item.select.value = item.value;
-        item.select.dispatchEvent(new Event('change', { bubbles: true }));
-        return;
-      }
-
-      if (!item.link) {
-        return;
-      }
-
-      item.link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-
-      const href = item.link.getAttribute('href');
-      if (href && href !== '#' && !href.startsWith('javascript:')) {
-        window.location.href = href;
-      }
+  const getLanguageItems = () => {
+    const linkNodes = Array.from(
+      languageSource.querySelectorAll('a.nturl, a[data-gt-lang], .gtranslate_wrapper a, .gt_float_switcher a, a[href], a[onclick]')
+    ).filter((link) => {
+      const label = (link.textContent || '').trim();
+      return label !== '';
     });
 
-    languageGrid.appendChild(button);
-  });
+    let items = linkNodes.map((link) => ({
+      label: (link.textContent || '').trim(),
+      link,
+      type: 'link',
+    }));
+
+    if (!items.length) {
+      const selectNode = languageSource.querySelector('select');
+      if (selectNode) {
+        items = Array.from(selectNode.options)
+          .filter((option) => option.value && !option.disabled)
+          .map((option) => ({
+            label: (option.textContent || '').trim(),
+            value: option.value,
+            select: selectNode,
+            type: 'select',
+          }));
+      }
+    }
+
+    return items;
+  };
+
+  const buildLanguageGrid = () => {
+    const languageItems = getLanguageItems();
+    if (!languageItems.length) {
+      return false;
+    }
+
+    languageGrid.innerHTML = '';
+
+    languageItems.forEach((item) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'language-modal__option';
+      button.textContent = item.label;
+
+      button.addEventListener('click', function () {
+        closeLanguageModal();
+
+        if (item.type === 'select' && item.select && item.value) {
+          item.select.value = item.value;
+          item.select.dispatchEvent(new Event('change', { bubbles: true }));
+          return;
+        }
+
+        if (!item.link) {
+          return;
+        }
+
+        item.link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+        const href = item.link.getAttribute('href');
+        if (href && href !== '#' && !href.startsWith('javascript:')) {
+          window.location.href = href;
+        }
+      });
+
+      languageGrid.appendChild(button);
+    });
+
+    return true;
+  };
 
   if (closeButton) {
     closeButton.addEventListener('click', function () {
@@ -225,13 +236,53 @@
     }
   });
 
+  let modalOpenScheduled = false;
+
   const scheduleModalOpen = function () {
+    if (modalOpenScheduled) {
+      return;
+    }
+
+    modalOpenScheduled = true;
     window.setTimeout(openLanguageModal, 1000);
   };
 
-  if (document.readyState === 'complete') {
+  const initModalWhenLanguagesReady = () => {
+    if (!buildLanguageGrid()) {
+      return false;
+    }
+
     scheduleModalOpen();
+    return true;
+  };
+
+  const startLanguageWatcher = () => {
+    if (initModalWhenLanguagesReady()) {
+      return;
+    }
+
+    const observer = new MutationObserver(function () {
+      if (initModalWhenLanguagesReady()) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(languageSource, { childList: true, subtree: true, attributes: true });
+
+    let retries = 0;
+    const pollTimer = window.setInterval(function () {
+      retries += 1;
+
+      if (initModalWhenLanguagesReady() || retries >= 20) {
+        window.clearInterval(pollTimer);
+        observer.disconnect();
+      }
+    }, 250);
+  };
+
+  if (document.readyState === 'complete') {
+    startLanguageWatcher();
   } else {
-    window.addEventListener('load', scheduleModalOpen, { once: true });
+    window.addEventListener('load', startLanguageWatcher, { once: true });
   }
 })();
