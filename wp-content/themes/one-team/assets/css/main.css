@@ -4,8 +4,9 @@
   --ot-secondary: #f59f2f;
   --ot-heading: #173047;
   --ot-text: #2b3640;
-  --ot-surface: #f5f7fa;
-  --ot-border: #d8e0e8;
+  --ot-surface: #f7f3e7;
+  --ot-border: #ddd4bc;
+  --ot-outline: #ddd4bc;
   --ot-white: #ffffff;
 
   --ot-font: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -30,7 +31,7 @@ body {
   margin: 0;
   font-family: var(--ot-font);
   color: var(--ot-text);
-  background: var(--ot-surface);
+  background: #f5f2e8;
   line-height: 1.6;
 }
 
@@ -317,7 +318,8 @@ body.menu-open {
 
 .language-landing__card {
   background: var(--ot-white);
-  border: 1px solid var(--ot-border);
+  outline: 1px solid var(--ot-outline);
+  outline-offset: 0;
   border-radius: var(--ot-radius);
   box-shadow: var(--ot-shadow);
   padding: var(--ot-space-4);
@@ -333,7 +335,8 @@ body.menu-open {
 /* Page content */
 .content-page {
   background: var(--ot-white);
-  border: 1px solid var(--ot-border);
+  outline: 1px solid var(--ot-outline);
+  outline-offset: 0;
   border-radius: var(--ot-radius);
   box-shadow: var(--ot-shadow);
   padding: var(--ot-space-4);
@@ -363,7 +366,8 @@ body.menu-open {
 .content-page__image {
   width: 100%;
   border-radius: 10px;
-  border: 1px solid var(--ot-border);
+  outline: 1px solid var(--ot-outline);
+  outline-offset: 0;
 }
 
 .entry-content > *:last-child {
@@ -382,7 +386,8 @@ body.menu-open {
 .qa-comments {
   margin-top: var(--ot-space-4);
   background: var(--ot-white);
-  border: 1px solid var(--ot-border);
+  outline: 1px solid var(--ot-outline);
+  outline-offset: 0;
   border-radius: var(--ot-radius);
   padding: var(--ot-space-4);
 }
@@ -401,7 +406,8 @@ body.menu-open {
 
 .comment-list .comment {
   margin: 0 0 var(--ot-space-3);
-  border: 1px solid var(--ot-border);
+  outline: 1px solid var(--ot-outline);
+  outline-offset: 0;
   border-radius: 10px;
   padding: var(--ot-space-3);
   background: var(--ot-surface);
@@ -545,4 +551,9 @@ body.menu-open {
   .qa-comments {
     padding: var(--ot-space-5);
   }
+}
+
+
+.custom-logo-link {
+  max-width: 80px;
 }
