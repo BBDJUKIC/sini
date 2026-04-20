@@ -116,6 +116,7 @@
   const closeButton = languageModal.querySelector('.language-modal__close');
   const continueButton = document.getElementById('home-language-modal-continue');
   const dialogNode = languageModal.querySelector('.language-modal__dialog');
+  const boundSyncNodes = new WeakSet();
   const closeLanguageModal = () => {
 
     languageModal.hidden = true;
@@ -240,37 +241,39 @@
   const triggerLanguageChange = (item) => {
     const languageCode = (item.code || '').toLowerCase();
 
-    const liveSelect = document.querySelector('.mobile-nav__language select.goog-te-combo, .gtranslate_wrapper select.goog-te-combo, select.goog-te-combo');
+    const liveLink = document.querySelector(`.mobile-nav__language a.nturl[data-gt-lang="${languageCode}"]`);
+    if (liveLink) {
+      liveLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      return;
+    }
+
+    const liveSelect = document.querySelector('.mobile-nav__language select.goog-te-combo, select.goog-te-combo');
     if (liveSelect && languageCode) {
       const hasOption = Array.from(liveSelect.options).some((option) => (option.value || '').toLowerCase() === languageCode);
       if (hasOption) {
         liveSelect.value = languageCode;
         liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
       }
     }
 
     if (item.type === 'select' && item.select && item.value) {
       item.select.value = item.value;
       item.select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  };
+
+  const ensureSelectedFlagSrc = () => {
+    const selectedFlag = document.querySelector('.mobile-nav__language .gt_selected img');
+    if (!selectedFlag) {
       return;
     }
 
-    const liveLink = Array.from(
-      document.querySelectorAll('.mobile-nav__language a.nturl[data-gt-lang], .gtranslate_wrapper a.nturl[data-gt-lang]')
-    ).find((node) => ((node.getAttribute('data-gt-lang') || '').trim().toLowerCase() === languageCode));
+    const currentSrc = (selectedFlag.getAttribute('src') || '').trim();
+    const lazySrc = (selectedFlag.getAttribute('data-gt-lazy-src') || '').trim();
 
-    if (liveLink) {
-      liveLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-      return;
-    }
-
-    if (item.link) {
-      item.link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-
-      const href = item.link.getAttribute('href');
-      if (href && href !== '#' && !href.startsWith('javascript:')) {
-        window.location.href = href;
-      }
+    if (!currentSrc && lazySrc) {
+      selectedFlag.setAttribute('src', lazySrc);
     }
   };
 
@@ -305,22 +308,24 @@
     const root = document.querySelector('.mobile-nav__language') || document;
     const liveSelect = root.querySelector('select.goog-te-combo');
 
-    if (liveSelect && !liveSelect.dataset.modalSyncBound) {
+    if (liveSelect && !boundSyncNodes.has(liveSelect)) {
       liveSelect.addEventListener('change', function () {
         syncModalCurrentLanguage(liveSelect.value);
+        ensureSelectedFlagSrc();
       });
-      liveSelect.dataset.modalSyncBound = '1';
+      boundSyncNodes.add(liveSelect);
     }
 
     Array.from(root.querySelectorAll('a.nturl[data-gt-lang]')).forEach((link) => {
-      if (link.dataset.modalSyncBound) {
+      if (boundSyncNodes.has(link)) {
         return;
       }
 
       link.addEventListener('click', function () {
         syncModalCurrentLanguage(link.getAttribute('data-gt-lang') || '');
+        window.setTimeout(ensureSelectedFlagSrc, 30);
       });
-      link.dataset.modalSyncBound = '1';
+      boundSyncNodes.add(link);
     });
   };
 
@@ -362,12 +367,17 @@
       button.addEventListener('click', function () {
         closeLanguageModal();
         triggerLanguageChange(item);
+        window.setTimeout(function () {
+          syncModalCurrentLanguage(getCurrentLanguageCode());
+          ensureSelectedFlagSrc();
+        }, 60);
       });
 
       languageGrid.appendChild(button);
     });
 
     syncModalCurrentLanguage(getCurrentLanguageCode());
+    ensureSelectedFlagSrc();
 
     return true;
   };
