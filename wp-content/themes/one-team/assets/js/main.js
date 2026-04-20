@@ -128,41 +128,200 @@
     languageModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('language-modal-open');
 
-    const firstOption = languageGrid.querySelector('.language-modal__option');
-    if (firstOption) {
-      firstOption.focus();
+    if (!languageGrid.querySelector('.language-modal__option')) {
+      buildLanguageGrid();
+    }
+
+    if (closeButton) {
+      closeButton.focus();
     }
   };
 
+  const getSourceRoots = () => {
+    const roots = [];
+    const liveLanguage = document.querySelector('.mobile-nav__language');
+
+    if (liveLanguage) {
+      roots.push(liveLanguage);
+    }
+
+    roots.push(languageSource);
+    return roots;
+  };
+
+  const collectLinkItems = (root) => {
+    return Array.from(root.querySelectorAll('a.nturl[data-gt-lang], a[data-gt-lang]'))
+      .map((link) => {
+        const label = (link.textContent || '').trim().replace(/\s+/g, ' ');
+        const code = ((link.getAttribute('data-gt-lang') || '').trim() || '').toLowerCase();
+        const flagNode = link.querySelector('img');
+        const flag = flagNode
+          ? (flagNode.getAttribute('src') || flagNode.getAttribute('data-gt-lazy-src') || '').trim()
+          : '';
+
+        if (!label || !code) {
+          return null;
+        }
+
+        return {
+          label,
+          code,
+          flag,
+          link,
+          type: 'link',
+        };
+      })
+      .filter(Boolean);
+  };
+
+  const collectSelectItems = (root) => {
+    const selectNode = root.querySelector('select.goog-te-combo, select');
+    if (!selectNode) {
+      return [];
+    }
+
+    return Array.from(selectNode.options)
+      .filter((option) => option.value && !option.disabled)
+      .map((option) => ({
+        label: (option.textContent || '').trim(),
+        code: (option.value || '').trim().toLowerCase(),
+        value: option.value,
+        select: selectNode,
+        type: 'select',
+      }))
+      .filter((item) => item.label && item.code);
+  };
+
+  const uniqueByCode = (items) => {
+    const seenCodes = new Set();
+    return items.filter((item) => {
+      const code = item.code || '';
+      if (!code || seenCodes.has(code)) {
+        return false;
+      }
+
+      seenCodes.add(code);
+      return true;
+    });
+  };
+
   const getLanguageItems = () => {
-    const linkNodes = Array.from(
-      languageSource.querySelectorAll('a.nturl, a[data-gt-lang], .gtranslate_wrapper a, .gt_float_switcher a, a[href], a[onclick]')
-    ).filter((link) => {
-      const label = (link.textContent || '').trim();
-      return label !== '';
+    const roots = getSourceRoots();
+    let items = [];
+
+    roots.forEach((root) => {
+      items = items.concat(collectLinkItems(root));
     });
 
-    let items = linkNodes.map((link) => ({
-      label: (link.textContent || '').trim(),
-      link,
-      type: 'link',
-    }));
+    items = uniqueByCode(items);
 
     if (!items.length) {
-      const selectNode = languageSource.querySelector('select');
-      if (selectNode) {
-        items = Array.from(selectNode.options)
-          .filter((option) => option.value && !option.disabled)
-          .map((option) => ({
-            label: (option.textContent || '').trim(),
-            value: option.value,
-            select: selectNode,
-            type: 'select',
-          }));
-      }
+      roots.forEach((root) => {
+        items = items.concat(collectSelectItems(root));
+      });
+      items = uniqueByCode(items);
+    }
+
+    if (items.length > 1) {
+      items.sort((a, b) => {
+        if (a.code === 'en') {
+          return -1;
+        }
+        if (b.code === 'en') {
+          return 1;
+        }
+        return 0;
+      });
     }
 
     return items;
+  };
+
+  const triggerLanguageChange = (item) => {
+    const languageCode = (item.code || '').toLowerCase();
+
+    const liveSelect = document.querySelector('.mobile-nav__language select.goog-te-combo, .gtranslate_wrapper select.goog-te-combo, select.goog-te-combo');
+    if (liveSelect && languageCode) {
+      const hasOption = Array.from(liveSelect.options).some((option) => (option.value || '').toLowerCase() === languageCode);
+      if (hasOption) {
+        liveSelect.value = languageCode;
+        liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    if (item.type === 'select' && item.select && item.value) {
+      item.select.value = item.value;
+      item.select.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+
+    const liveLink = Array.from(
+      document.querySelectorAll('.mobile-nav__language a.nturl[data-gt-lang], .gtranslate_wrapper a.nturl[data-gt-lang]')
+    ).find((node) => ((node.getAttribute('data-gt-lang') || '').trim().toLowerCase() === languageCode));
+
+    if (liveLink) {
+      liveLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      return;
+    }
+
+    if (item.link) {
+      item.link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+      const href = item.link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        window.location.href = href;
+      }
+    }
+  };
+
+  const getCurrentLanguageCode = () => {
+    const liveSelect = document.querySelector('.mobile-nav__language select.goog-te-combo, .gtranslate_wrapper select.goog-te-combo, select.goog-te-combo');
+    if (liveSelect && liveSelect.value) {
+      return (liveSelect.value || '').trim().toLowerCase();
+    }
+
+    const currentLink = document.querySelector('.mobile-nav__language a.nturl.gt_current[data-gt-lang], .gtranslate_wrapper a.nturl.gt_current[data-gt-lang]');
+    if (currentLink) {
+      return ((currentLink.getAttribute('data-gt-lang') || '').trim() || '').toLowerCase();
+    }
+
+    return 'en';
+  };
+
+  const syncModalCurrentLanguage = (languageCode) => {
+    const normalizedCode = (languageCode || '').trim().toLowerCase();
+    const options = Array.from(languageGrid.querySelectorAll('.language-modal__option'));
+
+    options.forEach((button) => {
+      const buttonCode = (button.getAttribute('data-gt-lang') || '').trim().toLowerCase();
+      const isCurrent = normalizedCode !== '' && buttonCode === normalizedCode;
+
+      button.classList.toggle('language-modal__option--current', isCurrent);
+      button.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+    });
+  };
+
+  const bindDropdownSync = () => {
+    const root = document.querySelector('.mobile-nav__language') || document;
+    const liveSelect = root.querySelector('select.goog-te-combo');
+
+    if (liveSelect && !liveSelect.dataset.modalSyncBound) {
+      liveSelect.addEventListener('change', function () {
+        syncModalCurrentLanguage(liveSelect.value);
+      });
+      liveSelect.dataset.modalSyncBound = '1';
+    }
+
+    Array.from(root.querySelectorAll('a.nturl[data-gt-lang]')).forEach((link) => {
+      if (link.dataset.modalSyncBound) {
+        return;
+      }
+
+      link.addEventListener('click', function () {
+        syncModalCurrentLanguage(link.getAttribute('data-gt-lang') || '');
+      });
+      link.dataset.modalSyncBound = '1';
+    });
   };
 
   const buildLanguageGrid = () => {
@@ -177,31 +336,38 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'language-modal__option';
-      button.textContent = item.label;
+
+      if (item.flag) {
+        const flagImage = document.createElement('img');
+        flagImage.className = 'language-modal__option-flag';
+        flagImage.src = item.flag;
+        flagImage.alt = '';
+        flagImage.width = 20;
+        flagImage.height = 20;
+        flagImage.loading = 'lazy';
+        button.appendChild(flagImage);
+      }
+
+      const labelNode = document.createElement('span');
+      labelNode.className = 'language-modal__option-label';
+      labelNode.textContent = item.label;
+      button.appendChild(labelNode);
+      button.setAttribute('data-gt-lang', item.code || '');
+      button.setAttribute('aria-pressed', 'false');
+
+      if (item.code === 'en') {
+        button.classList.add('language-modal__option--main');
+      }
 
       button.addEventListener('click', function () {
         closeLanguageModal();
-
-        if (item.type === 'select' && item.select && item.value) {
-          item.select.value = item.value;
-          item.select.dispatchEvent(new Event('change', { bubbles: true }));
-          return;
-        }
-
-        if (!item.link) {
-          return;
-        }
-
-        item.link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-
-        const href = item.link.getAttribute('href');
-        if (href && href !== '#' && !href.startsWith('javascript:')) {
-          window.location.href = href;
-        }
+        triggerLanguageChange(item);
       });
 
       languageGrid.appendChild(button);
     });
+
+    syncModalCurrentLanguage(getCurrentLanguageCode());
 
     return true;
   };
@@ -247,37 +413,37 @@
     window.setTimeout(openLanguageModal, 1000);
   };
 
-  const initModalWhenLanguagesReady = () => {
-    if (!buildLanguageGrid()) {
-      return false;
-    }
-
-    scheduleModalOpen();
-    return true;
-  };
+  const initModalWhenLanguagesReady = () => buildLanguageGrid();
 
   const startLanguageWatcher = () => {
     if (initModalWhenLanguagesReady()) {
+      bindDropdownSync();
       return;
     }
 
     const observer = new MutationObserver(function () {
       if (initModalWhenLanguagesReady()) {
+        bindDropdownSync();
         observer.disconnect();
       }
     });
 
-    observer.observe(languageSource, { childList: true, subtree: true, attributes: true });
+    getSourceRoots().forEach((root) => {
+      observer.observe(root, { childList: true, subtree: true, attributes: true });
+    });
 
     let retries = 0;
     const pollTimer = window.setInterval(function () {
       retries += 1;
 
       if (initModalWhenLanguagesReady() || retries >= 20) {
+        bindDropdownSync();
         window.clearInterval(pollTimer);
         observer.disconnect();
       }
     }, 250);
+
+    scheduleModalOpen();
   };
 
   if (document.readyState === 'complete') {
