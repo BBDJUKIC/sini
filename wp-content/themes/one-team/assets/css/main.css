@@ -586,6 +586,12 @@ body.menu-open {
   .custom-logo-link {
     width: 80px;
   }
+.home-layout {
+  width: 90%;
+}
 
+}
 
+.home-layout__top-text {
+  font-size: 52px;
 }
