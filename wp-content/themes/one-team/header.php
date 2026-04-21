@@ -23,11 +23,10 @@ if (! defined('ABSPATH')) {
     <?php wp_body_open(); ?>
 
     <a class="skip-link" href="#main-content"><?php esc_html_e('Skip to content', 'one-team'); ?></a>
-
     <header class="site-header" role="banner">
         <div class="site-header__inner container">
-            <a class="site-header__home-link" href="<?php echo esc_url(one_team_home_link_url()); ?>">
-                Home
+            <a class="site-header__home-link notranslate" translate="no" href="<?php echo esc_url(one_team_home_link_url()); ?>">
+                START
             </a>
 
             <a class="site-header__logo-link" href="<?php echo esc_url(home_url('/')); ?>" aria-label="<?php esc_attr_e('Language landing page', 'one-team'); ?>">
